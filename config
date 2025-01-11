@@ -28,6 +28,7 @@ declare -A configs=(
   # ["zsh"]="$HOME/.zshrc"
   ["nvim"]="$HOME/.config/nvim/"
   ["tmux"]="$HOME/.config/tmux/"
+  ["bin"]="$HOME/.local/bin/"
 )
 
 if [ $# -eq 1 ] && [[ -v configs["$1"] ]]; then
