@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function help {
-  echo "Usage: config <zsh/nvim/tmux>"
+  echo "Usage: config <bin/nvim/tmux>"
   exit 1
 }
 
