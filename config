@@ -6,13 +6,22 @@ function help {
 }
 
 function edit_commit_push {
-  pushd $1
+  pushd "$1" || exit
+
+  # Edit
   nvim
 
-  if [ $# -eq 2 ]
-  git commit -a
+  # Commit
+  if [ $# -ge 2 ]; then
+    git commit -a -m "$2"
+  else
+    git commit -a
+  fi
+
+  # Push
   git push
-  popd
+
+  popd || exit
 }
 
 declare -A configs=(
@@ -21,11 +30,10 @@ declare -A configs=(
   ["tmux"]="$HOME/.config/tmux/"
 )
 
-if [ $# -eq 1 ] && [ -v configs["$1"] ]; then 
-  local dir = "${configs[$1]}"
+if [ $# -eq 1 ] && [[ -v configs["$1"] ]]; then
+  dir="${configs[$1]}"
   shift
   edit_commit_push "$dir" "$@"
 else
   help
 fi
-
