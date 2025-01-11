@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function help {
+  echo "Usage: config <zsh/nvim/tmux>"
+  exit 1
+}
+
+function edit_commit_push {
+  pushd $1
+  nvim
+
+  if [ $# -eq 2 ]
+  git commit -a
+  git push
+  popd
+}
+
+declare -A configs=(
+  # ["zsh"]="$HOME/.zshrc"
+  ["nvim"]="$HOME/.config/nvim/"
+  ["tmux"]="$HOME/.config/tmux/"
+)
+
+if [ $# -eq 1 ] && [ -v configs["$1"] ]; then 
+  local dir = "${configs[$1]}"
+  shift
+  edit_commit_push "$dir" "$@"
+else
+  help
+fi
+
