@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+show_help() {
+  echo "Usage: ${0##*/} [PATTERN] [--help]"
+  echo ""
+  echo "Quickly select and connect to a Kubernetes pod with fuzzy finding."
+  echo ""
+  echo "Modes:"
+  echo "  No arguments    - Interactive selection with fzf"
+  echo "  With PATTERN    - Non-interactive filtered selection"
+  echo "  --help          - Show this help message"
+  echo ""
+  echo "Examples:"
+  echo "  ${0##*/}             # Interactive pod selection"
+  echo "  ${0##*/} web         # Auto-select pod containing \"web\""
+  echo "  ${0##*/} \"^auth-\"   # Regex match for pods starting with \"auth-\""
+  echo "  ${0##*/} --help      # Show this help message"
+}
+
+# Check for --help
+for arg in "$@"; do
+  if [[ "$arg" == "--help" ]]; then
+    show_help
+    exit 0
+  fi
+done
+
+# Determine mode based on arguments
+if [ $# -gt 0 ]; then
+  # Non-interactive mode - use first non-help argument as filter
+  filter="$1"
+  selected_pod=$(kubectl get pods --no-headers | awk '{print $1}' | fzf --filter="$filter" --select-1 --exit-0)
+else
+  # Interactive mode - show full fzf interface
+  selected_pod=$(kubectl get pods --no-headers | awk '{print $1}' | fzf --reverse --header="Select a pod to shell into")
+fi
+
+if [[ -n "$selected_pod" ]]; then
+  echo "Entering pod: $selected_pod"
+  kubectl exec -it "$selected_pod" -- sh -c 'command -v bash >/dev/null && exec bash || exec sh'
+else
+  echo "No pod matching filter: '$filter'"
+  exit 1
+fi
