@@ -88,7 +88,6 @@ if [ ! -f "$FILE" ]; then
   exit 1
 fi
 
-
 for TAG in $TAGS; do
   docker::shame "$REGISTRY" "$NAME" "$TAG" "$FILE"
 done
