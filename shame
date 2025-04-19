@@ -40,8 +40,9 @@ docker::shame() {
   local file="$4"
   local url="$registry/$app:$tag"
 
+  echo Building "$app"
   docker build --tag "$url" --file "$file" .
-  docker push "$url"
+  # docker push "$url"
 }
 
 TAGS=()
@@ -77,11 +78,17 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -n ${#TAGS[@]} ]]; then
-  for TAG in "$@"; do
-    docker::shame "$REGISTRY" "$NAME" "$TAG" "$FILE"
-  done
-else
+if [ -z "${TAGS[@]}" ]; then
   echo "No tags provided"
   exit 1
 fi
+
+if [ ! -f "$FILE" ]; then
+  echo "$FILE does not exist in $(pwd)"
+  exit 1
+fi
+
+
+for TAG in $TAGS; do
+  docker::shame "$REGISTRY" "$NAME" "$TAG" "$FILE"
+done
