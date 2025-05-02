@@ -33,9 +33,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -n "$FILTER" ]; then
-  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --reverse --filter="$FILTER" --header="Select a pod to shell into")
+  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --select-1 --exit-0 --filter="$FILTER")
 else
-  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --select-1 --exit-0 --header="Select a pod to shell into")
+  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf)
 fi
 
 if [[ -n "$selected" ]]; then
