@@ -13,32 +13,37 @@ show_help() {
   echo "Examples:"
   echo "  ${0##*/}             # Interactive pod selection"
   echo "  ${0##*/} web         # Auto-select pod containing \"web\""
-  echo "  ${0##*/} \"^auth-\"   # Regex match for pods starting with \"auth-\""
+  echo "  ${0##*/} \"^auth-\"    # Regex match for pods starting with \"auth-\""
   echo "  ${0##*/} --help      # Show this help message"
 }
 
-# Check for --help
-for arg in "$@"; do
-  if [[ "$arg" == "--help" ]]; then
+FILTER=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --help)
     show_help
     exit 0
-  fi
+    ;;
+  *)
+    if [ -n "$FILTER" ]; then
+      FILTER="$1"
+      shift
+    else
+      echo "Can not parse multiple filter values"
+      exit 1
+    fi
+    ;;
+  esac
 done
 
-# Determine mode based on arguments
-if [ $# -gt 0 ]; then
-  # Non-interactive mode - use first non-help argument as filter
-  filter="$1"
-  selected_pod=$(kubectl get pods --no-headers | awk '{print $1}' | fzf --filter="$filter" --select-1 --exit-0)
-else
-  # Interactive mode - show full fzf interface
-  selected_pod=$(kubectl get pods --no-headers | awk '{print $1}' | fzf --reverse --header="Select a pod to shell into")
-fi
+selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --reverse --filter="$FILTER" --select-1 --header="Select a pod to shell into")
 
-if [[ -n "$selected_pod" ]]; then
-  echo "Entering pod: $selected_pod"
-  kubectl exec -it "$selected_pod" -- sh -c 'command -v bash >/dev/null && exec bash || exec sh'
+if [[ -n "$selected" ]]; then
+  read -r namespace pod _ <<<"$selected"
+  echo "Entering pod: $pod"
+  kubectl -n "$namespace" exec -it "$pod" -- sh -c 'command -v bash >/dev/null && exec bash || exec sh'
 else
-  echo "No pod matching filter: '$filter'"
+  echo "No pod matching filter: '$FILTER'"
   exit 1
 fi
