@@ -26,13 +26,8 @@ while [[ $# -gt 0 ]]; do
     exit 0
     ;;
   *)
-    if [ -n "$FILTER" ]; then
-      FILTER="$1"
-      shift
-    else
-      echo "Can not parse multiple filter values"
-      exit 1
-    fi
+    FILTER="$1"
+    shift
     ;;
   esac
 done
