@@ -37,7 +37,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --reverse --filter="$FILTER" --header="Select a pod to shell into")
+if [ -n "$FILTER" ]; then
+  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --reverse --filter="$FILTER" --header="Select a pod to shell into")
+else
+  selected=$(kubectl get pods --no-headers --all-namespaces=true | fzf --select-1 --exit-0 --header="Select a pod to shell into")
+fi
 
 if [[ -n "$selected" ]]; then
   read -r namespace pod _ <<<"$selected"
