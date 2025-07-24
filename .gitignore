@@ -3,9 +3,11 @@
 
 # But not these files...
 !.gitignore
-!tmux-sessionizer
 !config
 !dev
+!drun
 !podshell
 !podlogs
 !shame
+!tmux-sessionizer
+
