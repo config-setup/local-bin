@@ -1,19 +1,5 @@
 #!/usr/bin/env bash
 
-show_help() {
-  echo "Usage: ${0##*/} [--help]"
-  echo ""
-  echo "Quickly select and connect to a Kubernetes pod with fuzzy finding."
-  echo ""
-  echo "Modes:"
-  echo "  No arguments    - Interactive selection with fzf"
-  echo "  --help          - Show this help message"
-  echo ""
-  echo "Examples:"
-  echo "  ${0##*/}             # Interactive pod selection"
-  echo "  ${0##*/} --help      # Show this help message"
-}
-
 # TODO: Handle options to pass run args
 # TODO: Handle options to pass build args
 docker run -it "$(docker build -q .)" "$@"
